@@ -472,7 +472,7 @@ export function type(obj){
  * @returns {document} document
  * @memberof Core
  */
-export function parse(markup, mime, forceXMLDom) {
+export function parse(markup, mime, forceXMLDom, onErrorHtmlFallback=true) {
 	var doc;
 	var Parser;
 
@@ -489,6 +489,12 @@ export function parse(markup, mime, forceXMLDom) {
 	}
 
 	doc = new Parser().parseFromString(markup, mime);
+  if (onErrorHtmlFallback && doc.getElementsByTagName('parsererror').length > 0) {
+    console.trace();
+    console.log(`Mime type in error: ${mime}`);
+    console.log(doc.getElementsByTagName('parsererror'));
+    doc = new Parser().parseFromString(markup, 'text/html');
+  }
 
 	return doc;
 }
